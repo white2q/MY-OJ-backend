@@ -40,8 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * 用户接口
  *
- * @author <a href="https://github.com/liyupi">程序员鱼皮</a>
- * @from <a href="https://yupi.icu">编程导航知识星球</a>
+ * @author <a href="https://github.com/white2q">ppf</a>
  */
 @RestController
 @RequestMapping("/user")

@@ -1,10 +1,12 @@
-package com.ppf.oj.model.dto.post;
+package com.ppf.oj.model.dto.question;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.ppf.oj.common.PageRequest;
-import java.io.Serializable;
-import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * 查询请求
@@ -13,52 +15,36 @@ import lombok.EqualsAndHashCode;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class PostQueryRequest extends PageRequest implements Serializable {
-
+public class QuestionQueryRequest extends PageRequest implements Serializable {
     /**
      * id
      */
     private Long id;
 
     /**
-     * id
+     * 创建用户 id
      */
-    private Long notId;
-
-    /**
-     * 搜索词
-     */
-    private String searchText;
+    @TableField(value = "userId")
+    private Long userId;
 
     /**
      * 标题
      */
+    @TableField(value = "title")
     private String title;
 
     /**
      * 内容
      */
+    @TableField(value = "content")
     private String content;
 
     /**
-     * 标签列表
+     * 标签列表（json 数组）
      */
+    @TableField(value = "tags")
     private List<String> tags;
 
-    /**
-     * 至少有一个标签
-     */
-    private List<String> orTags;
-
-    /**
-     * 创建用户 id
-     */
-    private Long userId;
-
-    /**
-     * 收藏用户 id
-     */
-    private Long favourUserId;
-
+    @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }

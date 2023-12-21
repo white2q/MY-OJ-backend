@@ -50,8 +50,7 @@ import org.springframework.stereotype.Service;
 /**
  * 帖子服务实现
  *
- * @author <a href="https://github.com/liyupi">程序员鱼皮</a>
- * @from <a href="https://yupi.icu">编程导航知识星球</a>
+ * @author <a href="https://github.com/white2q">ppf</a>
  */
 @Service
 @Slf4j
@@ -244,6 +243,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         postVO.setUser(userVO);
         // 2. 已登录，获取用户点赞、收藏状态
         User loginUser = userService.getLoginUserPermitNull(request);
+        // 判断用户 是否 点赞收藏该帖子
         if (loginUser != null) {
             // 获取点赞
             QueryWrapper<PostThumb> postThumbQueryWrapper = new QueryWrapper<>();

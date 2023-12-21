@@ -1,6 +1,6 @@
-package generator.service;
+package com.ppf.oj.service;
 
-import generator.domain.QuestionSubmit;
+import com.ppf.oj.model.entity.QuestionSubmit;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
