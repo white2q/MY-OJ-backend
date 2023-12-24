@@ -1,4 +1,4 @@
-package com.ppf.oj.model.entity;
+package com.ppf.oj.model.dto.question;
 
 import lombok.Data;
 

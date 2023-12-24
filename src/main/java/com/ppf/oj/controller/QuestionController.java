@@ -10,18 +10,14 @@ import com.ppf.oj.common.ResultUtils;
 import com.ppf.oj.constant.UserConstant;
 import com.ppf.oj.exception.BusinessException;
 import com.ppf.oj.exception.ThrowUtils;
-import com.ppf.oj.model.dto.question.QuestionAddRequest;
-import com.ppf.oj.model.dto.question.QuestionEditRequest;
-import com.ppf.oj.model.dto.question.QuestionQueryRequest;
-import com.ppf.oj.model.dto.question.QuestionUpdateRequest;
-import com.ppf.oj.model.entity.JudgeCase;
-import com.ppf.oj.model.entity.JudgeConfig;
+import com.ppf.oj.model.dto.question.*;
 import com.ppf.oj.model.entity.Question;
 import com.ppf.oj.model.entity.User;
 import com.ppf.oj.model.vo.QuestionVO;
 import com.ppf.oj.service.QuestionService;
 import com.ppf.oj.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,6 +58,19 @@ public class QuestionController {
         Question question = new Question();
         BeanUtils.copyProperties(questionAddRequest, question);
         List<String> tags = questionAddRequest.getTags();
+
+
+        JudgeConfig judgeConfig = questionAddRequest.getJudgeConfig();
+        List<JudgeCase> judgeCase = questionAddRequest.getJudgeCase();
+
+        if (judgeConfig != null) {
+            question.setJudgeConfig(GSON.toJson(judgeConfig));
+        }
+
+        if (CollectionUtils.isNotEmpty(judgeCase)) {
+            question.setJudgeCase(GSON.toJson(judgeCase));
+        }
+
         if (tags != null) {
             question.setTags(GSON.toJson(tags));
         }
@@ -116,12 +125,12 @@ public class QuestionController {
         Question question = new Question();
         BeanUtils.copyProperties(questionUpdateRequest, question);
         List<String> tags = questionUpdateRequest.getTags();
-        JudgeCase judgeCase = questionUpdateRequest.getJudgeCase();
+        List<JudgeCase> judgeCase = questionUpdateRequest.getJudgeCase();
         JudgeConfig judgeConfig = questionUpdateRequest.getJudgeConfig();
-        if (tags != null) {
+        if (CollectionUtils.isNotEmpty(tags)) {
             question.setTags(GSON.toJson(tags));
         }
-        if (judgeCase != null) {
+        if (CollectionUtils.isNotEmpty(judgeCase)) {
             question.setJudgeCase(GSON.toJson(tags));
         }
         if (judgeConfig != null) {
@@ -198,37 +207,31 @@ public class QuestionController {
         return ResultUtils.success(questionService.getQuestionVOPage(questionPage, request));
     }
 
-    /**
-     * 编辑（用户）
-     *
-     * @param questionEditRequest
-     * @param request
-     * @return
-     */
-    @PostMapping("/edit")
-    public BaseResponse<Boolean> editQuestion(@RequestBody QuestionEditRequest questionEditRequest, HttpServletRequest request) {
-        if (questionEditRequest == null || questionEditRequest.getId() <= 0) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        Question question = new Question();
-        BeanUtils.copyProperties(questionEditRequest, question);
-        List<String> tags = questionEditRequest.getTags();
-        if (tags != null) {
-            question.setTags(GSON.toJson(tags));
-        }
-        // 参数校验
-        questionService.validQuestion(question, false);
-        User loginUser = userService.getLoginUser(request);
-        long id = questionEditRequest.getId();
-        // 判断是否存在
-        Question oldQuestion = questionService.getById(id);
-        ThrowUtils.throwIf(oldQuestion == null, ErrorCode.NOT_FOUND_ERROR);
-        // 仅本人或管理员可编辑
-        if (!oldQuestion.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
-            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
-        }
-        boolean result = questionService.updateById(question);
-        return ResultUtils.success(result);
-    }
+//    /**
+//     * 编辑（用户）
+//     *
+//     * @param questionEditRequest
+//     * @param request
+//     * @return
+//     */
+//    @PostMapping("/edit")
+//    public BaseResponse<Boolean> editQuestion(@RequestBody QuestionEditRequest questionEditRequest, HttpServletRequest request) {
+//        if (questionEditRequest == null || questionEditRequest.getId() <= 0) {
+//            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+//        }
+//        Question question = new Question();
+//        BeanUtils.copyProperties(questionEditRequest, question);
+//        User loginUser = userService.getLoginUser(request);
+//        long id = questionEditRequest.getId();
+//        // 判断是否存在
+//        Question oldQuestion = questionService.getById(id);
+//        ThrowUtils.throwIf(oldQuestion == null, ErrorCode.NOT_FOUND_ERROR);
+//        // 仅本人或管理员可编辑
+//        if (!oldQuestion.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
+//            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+//        }
+//        boolean result = questionService.updateById(question);
+//        return ResultUtils.success(result);
+//    }
 
 }

@@ -1,8 +1,6 @@
 package com.ppf.oj.model.dto.question;
 
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.ppf.oj.model.entity.JudgeCase;
-import com.ppf.oj.model.entity.JudgeConfig;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -49,7 +47,7 @@ public class QuestionUpdateRequest implements Serializable {
      * 判题用例（json 数组）
      */
     @TableField(value = "judgeCase")
-    private JudgeCase judgeCase;
+    private List<JudgeCase> judgeCase;
 
     /**
      * 判题配置（json 对象）

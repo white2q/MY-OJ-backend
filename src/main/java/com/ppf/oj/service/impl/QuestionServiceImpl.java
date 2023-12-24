@@ -1,5 +1,6 @@
 package com.ppf.oj.service.impl;
 
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -8,6 +9,7 @@ import com.ppf.oj.constant.CommonConstant;
 import com.ppf.oj.exception.BusinessException;
 import com.ppf.oj.exception.ThrowUtils;
 import com.ppf.oj.mapper.QuestionMapper;
+import com.ppf.oj.model.dto.question.JudgeConfig;
 import com.ppf.oj.model.dto.question.QuestionQueryRequest;
 import com.ppf.oj.model.entity.Question;
 import com.ppf.oj.model.entity.User;
@@ -23,7 +25,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -70,7 +71,6 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
     @Override
     public QuestionVO getQuestionVO(Question question, HttpServletRequest request) {
         QuestionVO questionVO = QuestionVO.objToVo(question);
-        long questionId = question.getId();
         // 1. 关联查询用户信息
         Long userId = question.getUserId();
         User user = null;
@@ -78,7 +78,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
             user = userService.getById(userId);
         }
         UserVO userVO = userService.getUserVO(user);
-        questionVO.setUser(userVO);
+        questionVO.setUserVO(userVO);
         // 2. 已登录，获取用户点赞、收藏状态
 //        User loginUser = userService.getLoginUserPermitNull(request);
 //        // 判断用户 是否 点赞收藏该帖子
@@ -139,7 +139,6 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
     }
 
     @Override
-    // todo 待完善
     public Page<QuestionVO> getQuestionVOPage(Page<Question> questionPage, HttpServletRequest request) {
         List<Question> questionList = questionPage.getRecords();
         Page<QuestionVO> questionVOPage = new Page<>(questionPage.getCurrent(), questionPage.getSize(), questionPage.getTotal());
@@ -178,7 +177,8 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
             if (userIdUserListMap.containsKey(userId)) {
                 user = userIdUserListMap.get(userId).get(0);
             }
-            questionVO.setUser(userService.getUserVO(user));
+            questionVO.setUserVO(userService.getUserVO(user));
+            questionVO.setJudgeConfig(JSONUtil.toBean(question.getJudgeConfig(), JudgeConfig.class));
 //            questionVO.setHasThumb(questionIdHasThumbMap.getOrDefault(question.getId(), false));
 //            questionVO.setHasFavour(questionIdHasFavourMap.getOrDefault(question.getId(), false));
             return questionVO;

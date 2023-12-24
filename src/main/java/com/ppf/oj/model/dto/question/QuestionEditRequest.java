@@ -19,12 +19,6 @@ public class QuestionEditRequest implements Serializable {
      */
     private Long id;
 
-    /**
-     * 标签列表（json 数组）
-     */
-    @TableField(value = "tags")
-    private List<String> tags;
-
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }

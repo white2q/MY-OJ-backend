@@ -2,8 +2,7 @@ package com.ppf.oj.model.vo;
 
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.google.gson.Gson;
-import com.ppf.oj.model.entity.JudgeConfig;
+import com.ppf.oj.model.dto.question.JudgeConfig;
 import com.ppf.oj.model.entity.Question;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
@@ -19,9 +18,6 @@ import java.util.List;
  */
 @Data
 public class QuestionVO implements Serializable {
-
-    private final static Gson GSON = new Gson();
-
     /**
      * id
      */
@@ -85,7 +81,7 @@ public class QuestionVO implements Serializable {
     /**
      * 创建人信息
      */
-    private UserVO user;
+    private UserVO userVO;
 
     /**
      * 创建时间
@@ -141,11 +137,9 @@ public class QuestionVO implements Serializable {
             return null;
         }
         QuestionVO questionVO = new QuestionVO();
-        JudgeConfig judgeConfig = questionVO.getJudgeConfig();
         BeanUtils.copyProperties(question, questionVO);
         questionVO.setJudgeConfig(JSONUtil.toBean(question.getJudgeConfig(), JudgeConfig.class));
         questionVO.setTags(JSONUtil.toList(question.getTags(), String.class));
-        questionVO.setJudgeConfig(judgeConfig);
         return questionVO;
     }
 }
