@@ -16,15 +16,10 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class QuestionQueryRequest extends PageRequest implements Serializable {
-    /**
-     * id
-     */
-    private Long id;
 
     /**
      * 创建用户 id
      */
-    @TableField(value = "userId")
     private Long userId;
 
     /**

@@ -111,7 +111,6 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
         if (questionQueryRequest == null) {
             return queryWrapper;
         }
-        Long id = questionQueryRequest.getId();
         Long userId = questionQueryRequest.getUserId();
         String title = questionQueryRequest.getTitle();
         String content = questionQueryRequest.getContent();
@@ -130,7 +129,6 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
                 queryWrapper.like("tags", "\"" + tag + "\"");
             }
         }
-        queryWrapper.ne(ObjectUtils.isNotEmpty(id), "id", id);
         queryWrapper.eq(ObjectUtils.isNotEmpty(userId), "userId", userId);
         queryWrapper.eq("isDelete", false);
         queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),

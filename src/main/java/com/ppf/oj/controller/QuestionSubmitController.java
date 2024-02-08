@@ -59,6 +59,8 @@ public class QuestionSubmitController {
         boolean result = questionSubmitService.save(questionSubmit);
         ThrowUtils.throwIf(!result, new BusinessException(ErrorCode.OPERATION_ERROR));
         Long id = questionSubmit.getId();
+
+        // TODO 调用判题服务
         return ResultUtils.success(id);
     }
 

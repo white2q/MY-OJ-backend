@@ -58,8 +58,6 @@ public class QuestionController {
         Question question = new Question();
         BeanUtils.copyProperties(questionAddRequest, question);
         List<String> tags = questionAddRequest.getTags();
-
-
         JudgeConfig judgeConfig = questionAddRequest.getJudgeConfig();
         List<JudgeCase> judgeCase = questionAddRequest.getJudgeCase();
 
@@ -74,7 +72,6 @@ public class QuestionController {
         if (tags != null) {
             question.setTags(GSON.toJson(tags));
         }
-        questionService.validQuestion(question, true);
         User loginUser = userService.getLoginUser(request);
         question.setUserId(loginUser.getId());
         question.setFavourNum(0);
@@ -131,13 +128,11 @@ public class QuestionController {
             question.setTags(GSON.toJson(tags));
         }
         if (CollectionUtils.isNotEmpty(judgeCase)) {
-            question.setJudgeCase(GSON.toJson(tags));
+            question.setJudgeCase(GSON.toJson(judgeCase));
         }
         if (judgeConfig != null) {
-            question.setJudgeCase(GSON.toJson(tags));
+            question.setJudgeConfig(GSON.toJson(judgeConfig));
         }
-        // 参数校验
-        questionService.validQuestion(question, false);
         long id = questionUpdateRequest.getId();
         // 判断是否存在
         Question oldQuestion = questionService.getById(id);
@@ -165,6 +160,25 @@ public class QuestionController {
     }
 
     /**
+     * 根据 id 获取
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/get")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Question> getQuestionById(long id, HttpServletRequest request) {
+        if (id <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        Question question = questionService.getById(id);
+        if (question == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        return ResultUtils.success(question);
+    }
+
+    /**
      * 分页获取列表（封装类）
      *
      * @param questionQueryRequest
@@ -181,6 +195,27 @@ public class QuestionController {
         Page<Question> questionPage = questionService.page(new Page<>(current, size),
                 questionService.getQueryWrapper(questionQueryRequest));
         return ResultUtils.success(questionService.getQuestionVOPage(questionPage, request));
+    }
+
+
+    /**
+     * 分页获取列表（封装类）
+     *
+     * @param questionQueryRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/list/page")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Page<Question>> listQuestionByPage(@RequestBody QuestionQueryRequest questionQueryRequest,
+                                                               HttpServletRequest request) {
+        long current = questionQueryRequest.getCurrent();
+        long size = questionQueryRequest.getPageSize();
+        // 限制爬虫
+        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+        Page<Question> questionPage = questionService.page(new Page<>(current, size),
+                questionService.getQueryWrapper(questionQueryRequest));
+        return ResultUtils.success(questionPage);
     }
 
     /**
@@ -207,31 +242,6 @@ public class QuestionController {
         return ResultUtils.success(questionService.getQuestionVOPage(questionPage, request));
     }
 
-//    /**
-//     * 编辑（用户）
-//     *
-//     * @param questionEditRequest
-//     * @param request
-//     * @return
-//     */
-//    @PostMapping("/edit")
-//    public BaseResponse<Boolean> editQuestion(@RequestBody QuestionEditRequest questionEditRequest, HttpServletRequest request) {
-//        if (questionEditRequest == null || questionEditRequest.getId() <= 0) {
-//            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-//        }
-//        Question question = new Question();
-//        BeanUtils.copyProperties(questionEditRequest, question);
-//        User loginUser = userService.getLoginUser(request);
-//        long id = questionEditRequest.getId();
-//        // 判断是否存在
-//        Question oldQuestion = questionService.getById(id);
-//        ThrowUtils.throwIf(oldQuestion == null, ErrorCode.NOT_FOUND_ERROR);
-//        // 仅本人或管理员可编辑
-//        if (!oldQuestion.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
-//            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
-//        }
-//        boolean result = questionService.updateById(question);
-//        return ResultUtils.success(result);
-//    }
+
 
 }

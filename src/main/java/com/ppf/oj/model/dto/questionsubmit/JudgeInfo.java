@@ -17,9 +17,9 @@ public class JudgeInfo {
     /**
      * 运行时长
      */
-    private String time;
+    private long time;
     /**
      * 占用内存
      */
-    private String memory;
+    private long memory;
 }
