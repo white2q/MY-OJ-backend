@@ -1,8 +1,7 @@
 package com.ppf.oj.judge;
 
-import com.ppf.oj.model.dto.questionsubmit.JudgeInfo;
-import com.ppf.oj.model.entity.QuestionSubmit;
+import com.ppf.oj.model.vo.QuestionSubmitAddResponse;
 
 public interface JudgeService {
-    JudgeInfo doJudge(long questionSubmitId);
+    QuestionSubmitAddResponse doJudge(long questionSubmitId);
 }

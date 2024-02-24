@@ -1,6 +1,7 @@
 package com.ppf.oj.model.dto.questionsubmit;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.ppf.oj.judge.codeSandBox.model.JudgeInfo;
 import lombok.Data;
 
 import java.io.Serializable;

@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.google.gson.Gson;
-import com.ppf.oj.model.dto.questionsubmit.JudgeInfo;
+import com.ppf.oj.judge.codeSandBox.model.JudgeInfo;
 import com.ppf.oj.model.entity.QuestionSubmit;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;

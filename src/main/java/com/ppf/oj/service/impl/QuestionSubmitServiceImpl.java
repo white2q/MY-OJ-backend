@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ppf.oj.constant.CommonConstant;
 import com.ppf.oj.mapper.QuestionSubmitMapper;
-import com.ppf.oj.model.dto.questionsubmit.JudgeInfo;
+import com.ppf.oj.judge.codeSandBox.model.JudgeInfo;
 import com.ppf.oj.model.dto.questionsubmit.QuestionSubmitQueryRequest;
 import com.ppf.oj.model.entity.QuestionSubmit;
 import com.ppf.oj.model.entity.User;

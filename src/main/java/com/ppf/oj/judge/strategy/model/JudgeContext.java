@@ -1,7 +1,7 @@
 package com.ppf.oj.judge.strategy.model;
 
 import com.ppf.oj.model.dto.question.JudgeConfig;
-import com.ppf.oj.model.dto.questionsubmit.JudgeInfo;
+import com.ppf.oj.judge.codeSandBox.model.JudgeInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

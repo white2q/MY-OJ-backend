@@ -1,6 +1,5 @@
 package com.ppf.oj.judge.codeSandBox.model;
 
-import com.ppf.oj.model.dto.questionsubmit.JudgeInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

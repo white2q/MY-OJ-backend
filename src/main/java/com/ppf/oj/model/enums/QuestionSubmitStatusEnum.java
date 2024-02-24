@@ -4,9 +4,7 @@ package com.ppf.oj.model.enums;
 public enum QuestionSubmitStatusEnum {
     WAITING("等待中", 0),
     RUNNING("运行中", 1),
-    SUCCESS("完成", 2),
-    WRONG_ANSWER("错误答案", 3);
-
+    SUCCESS("完成", 2);
     private final String text;
     private final int value;
 

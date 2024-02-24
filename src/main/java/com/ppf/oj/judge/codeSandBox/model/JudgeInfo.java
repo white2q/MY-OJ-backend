@@ -1,4 +1,4 @@
-package com.ppf.oj.model.dto.questionsubmit;
+package com.ppf.oj.judge.codeSandBox.model;
 
 import lombok.Data;
 
