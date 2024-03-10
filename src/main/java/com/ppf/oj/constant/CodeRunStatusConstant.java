@@ -15,7 +15,7 @@ public interface CodeRunStatusConstant {
     /**
      * wa
      */
-    String WONG_ANSWER = " WongAnswer";
+    String WRONG_ANSWER = " WrongAnswer";
 
     /**
      * TLE

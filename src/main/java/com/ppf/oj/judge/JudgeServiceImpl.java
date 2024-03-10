@@ -95,7 +95,16 @@ public class JudgeServiceImpl implements JudgeService {
         if (!updateQuestionSubmitRunStatus(QuestionSubmitStatusEnum.SUCCESS.getValue(), questionSubmitId)) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "题目状态更新错误");
         }
-        return judgeStrategyManage.doJudge(judgeContext);
+        QuestionSubmitAddResponse res = judgeStrategyManage.doJudge(judgeContext);
+
+        String resStatus = res.getStatus();
+        Integer st = QuestionSubmitStatusEnum.getEnumByText(resStatus);
+        if (st != null) {
+            if (!updateQuestionSubmitRunStatus(st, questionSubmitId)) {
+                throw new BusinessException(ErrorCode.SYSTEM_ERROR, "题目状态更新错误");
+            }
+        }
+        return res;
     }
 
     public boolean updateQuestionSubmitRunStatus(int status, long questionSubmitId) {

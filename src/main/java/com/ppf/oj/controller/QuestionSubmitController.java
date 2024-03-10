@@ -14,7 +14,6 @@ import com.ppf.oj.model.entity.QuestionSubmit;
 import com.ppf.oj.model.entity.User;
 import com.ppf.oj.model.vo.QuestionSubmitAddResponse;
 import com.ppf.oj.model.vo.QuestionSubmitVO;
-import com.ppf.oj.service.QuestionService;
 import com.ppf.oj.service.QuestionSubmitService;
 import com.ppf.oj.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -36,9 +35,6 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/question_submit")
 @Slf4j
 public class QuestionSubmitController {
-
-    @Resource
-    private QuestionService questionService;
 
     @Resource
     private QuestionSubmitService questionSubmitService;
@@ -85,7 +81,5 @@ public class QuestionSubmitController {
         Page<QuestionSubmit> questionSubmitPage = questionSubmitService.page(new Page<>(current, pageSize),
                 questionSubmitService.getQueryWrapper(questionSubmitQueryRequest));
         return ResultUtils.success(questionSubmitService.getQuestionSubmitVOPage(questionSubmitPage, request));
-
     }
-
 }

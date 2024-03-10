@@ -1,5 +1,6 @@
 package com.ppf.oj.model.vo;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -114,10 +115,12 @@ public class QuestionSubmitVO implements Serializable {
         if (questionSubmit == null) {
             return null;
         }
+
         QuestionSubmitVO questionSubmitVO = new QuestionSubmitVO();
         String judgeInfo = questionSubmit.getJudgeInfo();
         BeanUtils.copyProperties(questionSubmit, questionSubmitVO);
-        questionSubmitVO.setJudgeInfo(JSONUtil.toBean(judgeInfo, JudgeInfo.class));
+        if(StrUtil.isNotBlank(judgeInfo) && !"null".equals(judgeInfo) && !"NULL".equals(judgeInfo))
+            questionSubmitVO.setJudgeInfo(JSONUtil.toBean(judgeInfo, JudgeInfo.class));
         return questionSubmitVO;
     }
 }

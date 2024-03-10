@@ -1,12 +1,10 @@
 package com.ppf.oj.service.impl;
 
-import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ppf.oj.constant.CommonConstant;
 import com.ppf.oj.mapper.QuestionSubmitMapper;
-import com.ppf.oj.judge.codeSandBox.model.JudgeInfo;
 import com.ppf.oj.model.dto.questionsubmit.QuestionSubmitQueryRequest;
 import com.ppf.oj.model.entity.QuestionSubmit;
 import com.ppf.oj.model.entity.User;
@@ -22,6 +20,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -56,8 +55,11 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         Long userId = questionSubmitQueryRequest.getUserId();
         String sortField = questionSubmitQueryRequest.getSortField();
         String sortOrder = questionSubmitQueryRequest.getSortOrder();
-        queryWrapper.eq("language", language);
-        queryWrapper.ne(ObjectUtils.isNotEmpty(id), "id", id);
+
+        Optional<String> optionalLanguage = Optional.ofNullable(language);
+        optionalLanguage.ifPresent(lang -> queryWrapper.eq("language", lang));
+//        queryWrapper.eq("language", language);
+//        queryWrapper.ne(ObjectUtils.isNotEmpty(id), "id", id);
         queryWrapper.eq(ObjectUtils.isNotEmpty(userId), "userId", userId);
         queryWrapper.eq(ObjectUtils.isNotEmpty(questionId), "questionId", questionId);
         queryWrapper.eq("isDelete", false);
@@ -86,7 +88,6 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
                 user = userIdUserListMap.get(userId).get(0);
             }
             questionSubmitVO.setUserVO(userService.getUserVO(user));
-            questionSubmitVO.setJudgeInfo(JSONUtil.toBean(questionSubmit.getJudgeInfo(), JudgeInfo.class));
             return questionSubmitVO;
         }).collect(Collectors.toList());
         questionVOPage.setRecords(questionSubmitVOList);

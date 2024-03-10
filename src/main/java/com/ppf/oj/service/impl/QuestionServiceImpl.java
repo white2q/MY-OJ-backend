@@ -79,23 +79,6 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
         }
         UserVO userVO = userService.getUserVO(user);
         questionVO.setUserVO(userVO);
-        // 2. 已登录，获取用户点赞、收藏状态
-//        User loginUser = userService.getLoginUserPermitNull(request);
-//        // 判断用户 是否 点赞收藏该帖子
-//        if (loginUser != null) {
-//            // 获取点赞
-//            QueryWrapper<QuestionThumb> questionThumbQueryWrapper = new QueryWrapper<>();
-//            questionThumbQueryWrapper.in("questionId", questionId);
-//            questionThumbQueryWrapper.eq("userId", loginUser.getId());
-//            QuestionThumb questionThumb = questionThumbMapper.selectOne(questionThumbQueryWrapper);
-//            questionVO.setHasThumb(questionThumb != null);
-//            // 获取收藏
-//            QueryWrapper<QuestionFavour> questionFavourQueryWrapper = new QueryWrapper<>();
-//            questionFavourQueryWrapper.in("questionId", questionId);
-//            questionFavourQueryWrapper.eq("userId", loginUser.getId());
-//            QuestionFavour questionFavour = questionFavourMapper.selectOne(questionFavourQueryWrapper);
-//            questionVO.setHasFavour(questionFavour != null);
-//        }
         return questionVO;
     }
 
