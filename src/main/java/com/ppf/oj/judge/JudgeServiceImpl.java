@@ -1,6 +1,8 @@
 package com.ppf.oj.judge;
 
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.google.gson.Gson;
 import com.ppf.oj.common.ErrorCode;
 import com.ppf.oj.exception.BusinessException;
 import com.ppf.oj.judge.codeSandBox.CodeSandbox;
@@ -38,6 +40,8 @@ public class JudgeServiceImpl implements JudgeService {
     @Resource
     private QuestionService questionService;
 
+    private final static Gson GSON = new Gson();
+
     @Override
     public QuestionSubmitAddResponse doJudge(long questionSubmitId) {
         // 1）传入题目的提交 id，获取到对应的题目、提交信息（包含代码、编程语言等）
@@ -50,19 +54,6 @@ public class JudgeServiceImpl implements JudgeService {
         Question question = questionService.getById(questionId);
         if (question == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "题目不存在");
-        }
-
-        // 2）如果题目提交状态不为等待中，就不用重复执行了
-        Integer status = questionSubmit.getStatus();
-        QuestionSubmitStatusEnum statusEnum = QuestionSubmitStatusEnum.getEnumByValue(status);
-        if (!QuestionSubmitStatusEnum.WAITING.equals(statusEnum)) {
-            throw new BusinessException(ErrorCode.OPERATION_ERROR, "正在运行中或已执行完");
-        }
-
-        // todo 加锁防止在还未改变状态之前反复向代码沙箱中提交代码，占用性能
-        // 3）更改判题（题目提交）的状态为 “运行中”，防止重复执行
-        if (!updateQuestionSubmitRunStatus(QuestionSubmitStatusEnum.RUNNING.getValue(), questionSubmitId)) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "题目状态更新错误");
         }
         // 4）调用沙箱，获取到执行结果
         String judgeCase = question.getJudgeCase();
@@ -81,6 +72,8 @@ public class JudgeServiceImpl implements JudgeService {
         // 5）根据沙箱的执行结果，设置题目的判题状态和信息
         List<String> outputList_raw = judgeCases.stream().map(JudgeCase::getOutput).collect(Collectors.toList());
         List<String> outputList_user = executeCodeResponse.getOutputList();
+        // todo 在沙箱中去改 去除结果后面的\n 暂时先这样写
+        outputList_user = outputList_user.stream().map(s -> s.replace("\n", "")).collect(Collectors.toList());
         JudgeInfo judgeInfo = executeCodeResponse.getJudgeInfo();
         JudgeContext judgeContext = new JudgeContext();
         judgeContext.setOutputList_raw(outputList_raw);
@@ -90,25 +83,34 @@ public class JudgeServiceImpl implements JudgeService {
         judgeContext.setJudgeConfig(JSONUtil.toBean(judgeConfig, JudgeConfig.class));
         judgeContext.setLanguage(language);
         JudgeStrategyManage judgeStrategyManage = new JudgeStrategyManage();
-
-        // 执行完代码沙箱， 将状态更改为success
-        if (!updateQuestionSubmitRunStatus(QuestionSubmitStatusEnum.SUCCESS.getValue(), questionSubmitId)) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "题目状态更新错误");
-        }
+        // 执行判题
         QuestionSubmitAddResponse res = judgeStrategyManage.doJudge(judgeContext);
-
+        // 设置判题结果
         String resStatus = res.getStatus();
-        Integer st = QuestionSubmitStatusEnum.getEnumByText(resStatus);
-        if (st != null) {
-            if (!updateQuestionSubmitRunStatus(st, questionSubmitId)) {
+        Integer status = QuestionSubmitStatusEnum.getEnumByText(resStatus);
+        if (status != null) {
+            // 更新题目表提交数量
+            UpdateWrapper<Question> wrapper = new UpdateWrapper<>();
+            wrapper.eq("id", questionSubmit.getQuestionId());
+            if (status == QuestionSubmitStatusEnum.ACCEPTED.getValue())
+                wrapper.setSql("acceptedNum = acceptedNum + 1");
+            wrapper.setSql("submitNum = submitNum + 1");
+            if (!questionService.update(wrapper)) {
+                throw new BusinessException(ErrorCode.OPERATION_ERROR, "更新提交信息错误");
+            }
+            if (!updateQuestionSubmitRunStatus(status, judgeInfo, questionSubmitId)) {
                 throw new BusinessException(ErrorCode.SYSTEM_ERROR, "题目状态更新错误");
             }
-        }
+        } else throw new BusinessException(ErrorCode.SYSTEM_ERROR);
         return res;
     }
 
-    public boolean updateQuestionSubmitRunStatus(int status, long questionSubmitId) {
+    public boolean updateQuestionSubmitRunStatus(int status, JudgeInfo judgeInfo, long questionSubmitId) {
         QuestionSubmit questionSubmit = new QuestionSubmit();
+        if (judgeInfo != null) {
+            String info = GSON.toJson(judgeInfo);
+            questionSubmit.setJudgeInfo(info);
+        }
         questionSubmit.setId(questionSubmitId);
         questionSubmit.setStatus(status);
         return questionSubmitService.updateById(questionSubmit);

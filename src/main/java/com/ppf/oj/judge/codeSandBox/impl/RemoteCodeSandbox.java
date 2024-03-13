@@ -14,9 +14,7 @@ import java.util.List;
 
 public class RemoteCodeSandbox implements CodeSandbox {
 
-
 //    private static final String REMOTE_CODE_SANDBOX_URL = "http://127.0.0.1:8010/run/code";
-
 //    private static final String REMOTE_CODE_SANDBOX_URL = "http://192.168.232.130:8010/run/code";
 //    private static final String REMOTE_CODE_SANDBOX_URL = "http://47.108.114.160:8010/run/code";
 
@@ -41,10 +39,6 @@ public class RemoteCodeSandbox implements CodeSandbox {
         if (StringUtils.isBlank(response)) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "executeCode remoteSandbox error, message = " + response);
         }
-
-        ExecuteCodeResponse executeCodeResponse = JSONUtil.toBean(response, ExecuteCodeResponse.class);
-
-        System.out.println(executeCodeResponse);
-        return executeCodeResponse;
+        return JSONUtil.toBean(response, ExecuteCodeResponse.class);
     }
 }

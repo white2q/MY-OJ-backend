@@ -7,17 +7,19 @@ import com.ppf.oj.common.ErrorCode;
 import com.ppf.oj.common.ResultUtils;
 import com.ppf.oj.exception.BusinessException;
 import com.ppf.oj.exception.ThrowUtils;
-import com.ppf.oj.judge.JudgeService;
 import com.ppf.oj.model.dto.questionsubmit.QuestionSubmitAddRequest;
 import com.ppf.oj.model.dto.questionsubmit.QuestionSubmitQueryRequest;
 import com.ppf.oj.model.entity.QuestionSubmit;
 import com.ppf.oj.model.entity.User;
-import com.ppf.oj.model.vo.QuestionSubmitAddResponse;
+import com.ppf.oj.model.enums.QuestionSubmitStatusEnum;
 import com.ppf.oj.model.vo.QuestionSubmitVO;
+import com.ppf.oj.rabbitmq.MessageProducer;
 import com.ppf.oj.service.QuestionSubmitService;
 import com.ppf.oj.service.UserService;
+import com.ppf.oj.ws.WebSocket;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,18 +41,21 @@ public class QuestionSubmitController {
     @Resource
     private QuestionSubmitService questionSubmitService;
 
+    @Value("${codeSandbox.type}")
+    private String key;
+
     @Resource
     private UserService userService;
 
     @Resource
-    private JudgeService judgeService;
+    private MessageProducer messageProducer;
 
     private final static Gson GSON = new Gson();
 
     @PostMapping("/add")
-    public BaseResponse<QuestionSubmitAddResponse> doQuestionSubmit(@RequestBody QuestionSubmitAddRequest questionSubmitAddRequest, HttpServletRequest request) {
+    public BaseResponse<Long> doQuestionSubmit(@RequestBody QuestionSubmitAddRequest questionSubmitAddRequest, HttpServletRequest request) {
         Long questionId = questionSubmitAddRequest.getQuestionId();
-        if (questionSubmitAddRequest == null || questionId <= 0) {
+        if (questionId <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         User loginUser = userService.getLoginUser(request);
@@ -63,13 +68,13 @@ public class QuestionSubmitController {
         // 手动深拷贝转JSON
         questionSubmit.setJudgeInfo(GSON.toJson(questionSubmitAddRequest.getJudgeInfo()));
         questionSubmit.setUserId(loginUser.getId());
+        questionSubmit.setStatus(QuestionSubmitStatusEnum.WAITING.getValue());
         boolean result = questionSubmitService.save(questionSubmit);
         ThrowUtils.throwIf(!result, new BusinessException(ErrorCode.OPERATION_ERROR));
         Long id = questionSubmit.getId();
-
-        // todo 改为异步等待
-        QuestionSubmitAddResponse questionSubmitResponse = judgeService.doJudge(id);
-        return ResultUtils.success(questionSubmitResponse);
+        // 消息队列解耦
+        messageProducer.sendMessage("code_exchange", id.toString(), key);
+        return ResultUtils.success(id);
     }
 
     @PostMapping("/list/page/vo")
