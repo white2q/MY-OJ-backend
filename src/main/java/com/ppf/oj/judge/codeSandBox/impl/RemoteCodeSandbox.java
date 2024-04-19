@@ -8,20 +8,22 @@ import com.ppf.oj.judge.codeSandBox.CodeSandbox;
 import com.ppf.oj.judge.codeSandBox.model.ExecuteCodeRequest;
 import com.ppf.oj.judge.codeSandBox.model.ExecuteCodeResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.HashMap;
 import java.util.List;
 
 public class RemoteCodeSandbox implements CodeSandbox {
 
-//    private static final String REMOTE_CODE_SANDBOX_URL = "http://127.0.0.1:8010/run/code";
-//    private static final String REMOTE_CODE_SANDBOX_URL = "http://192.168.232.130:8010/run/code";
-//    private static final String REMOTE_CODE_SANDBOX_URL = "http://47.108.114.160:8010/run/code";
+    @Value("${codeSandbox.url}")
+    private String url;
 
-    private static final String REMOTE_CODE_SANDBOX_URL = "http://162.14.107.142:8010/run/code";
+    @Value("${codeSandbox.port}")
+    private String port;
 
     @Override
     public ExecuteCodeResponse codeRunning(ExecuteCodeRequest request) {
+        String codeSandboxUrl = String.format("http://%s:%s/run/code", url, port);
         String code = request.getCode();
         String language = request.getLanguage();
         List<String> inputList = request.getInputList();
@@ -31,7 +33,7 @@ public class RemoteCodeSandbox implements CodeSandbox {
         params.put("language", language);
         params.put("inputList", inputList);
 
-        String response = HttpRequest.post(REMOTE_CODE_SANDBOX_URL)
+        String response = HttpRequest.post(codeSandboxUrl)
                 .body(JSONUtil.toJsonStr(params))
                 .execute()
                 .body();

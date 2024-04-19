@@ -58,24 +58,27 @@ public class QuestionController {
         Question question = new Question();
         BeanUtils.copyProperties(questionAddRequest, question);
         List<String> tags = questionAddRequest.getTags();
+        List<String> source = questionAddRequest.getSource();
         JudgeConfig judgeConfig = questionAddRequest.getJudgeConfig();
-        List<JudgeCase> judgeCase = questionAddRequest.getJudgeCase();
+        List<SampleCase> sampleCase = questionAddRequest.getSampleCase();
 
         if (judgeConfig != null) {
             question.setJudgeConfig(GSON.toJson(judgeConfig));
         }
 
-        if (CollectionUtils.isNotEmpty(judgeCase)) {
-            question.setJudgeCase(GSON.toJson(judgeCase));
+        if (CollectionUtils.isNotEmpty(sampleCase)) {
+            question.setSampleCase(GSON.toJson(sampleCase));
         }
 
         if (tags != null) {
             question.setTags(GSON.toJson(tags));
         }
+
+        if (source != null) {
+            question.setSource(GSON.toJson(source));
+        }
         User loginUser = userService.getLoginUser(request);
         question.setUserId(loginUser.getId());
-        question.setFavourNum(0);
-        question.setThumbNum(0);
         boolean result = questionService.save(question);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         long newQuestionId = question.getId();
@@ -122,13 +125,19 @@ public class QuestionController {
         Question question = new Question();
         BeanUtils.copyProperties(questionUpdateRequest, question);
         List<String> tags = questionUpdateRequest.getTags();
-        List<JudgeCase> judgeCase = questionUpdateRequest.getJudgeCase();
+        List<String> source = questionUpdateRequest.getSource();
+        List<SampleCase> sampleCase = questionUpdateRequest.getSampleCase();
         JudgeConfig judgeConfig = questionUpdateRequest.getJudgeConfig();
         if (CollectionUtils.isNotEmpty(tags)) {
             question.setTags(GSON.toJson(tags));
         }
-        if (CollectionUtils.isNotEmpty(judgeCase)) {
-            question.setJudgeCase(GSON.toJson(judgeCase));
+
+        if (CollectionUtils.isNotEmpty(source)) {
+            question.setSource(GSON.toJson(source));
+        }
+
+        if (CollectionUtils.isNotEmpty(sampleCase)) {
+            question.setSampleCase(GSON.toJson(sampleCase));
         }
         if (judgeConfig != null) {
             question.setJudgeConfig(GSON.toJson(judgeConfig));

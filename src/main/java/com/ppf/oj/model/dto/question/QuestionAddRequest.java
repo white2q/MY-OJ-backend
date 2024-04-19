@@ -33,16 +33,16 @@ public class QuestionAddRequest implements Serializable {
     private List<String> tags;
 
     /**
-     * 题目答案
+     * 题目来源（json 数组）
      */
-    @TableField(value = "answer")
-    private String answer;
+    @TableField(value = "source")
+    private List<String> source;
 
     /**
-     * 判题用例（json 数组）
+     * 判题样例（json 数组）
      */
-    @TableField(value = "judgeCase")
-    private List<JudgeCase> judgeCase;
+    @TableField(value = "sampleCase")
+    private List<SampleCase> sampleCase;
 
     /**
      * 判题配置（json 对象）

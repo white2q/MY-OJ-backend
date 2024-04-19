@@ -51,19 +51,18 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
         String title = question.getTitle();
         String content = question.getContent();
         String tags = question.getTags();
-        String answer = question.getAnswer();
-        String judgeCase = question.getJudgeCase();
+        String sampleCase = question.getSampleCase();
         String judgeConfig = question.getJudgeConfig();
 
         // 创建时，参数不能为空
         if (add) {
-            ThrowUtils.throwIf(StringUtils.isAnyBlank(title, content, tags, answer, judgeCase, judgeConfig), ErrorCode.PARAMS_ERROR);
+            ThrowUtils.throwIf(StringUtils.isAnyBlank(title, content, tags, sampleCase, judgeConfig), ErrorCode.PARAMS_ERROR);
         }
         // 有参数则校验
         if (StringUtils.isNotBlank(title) && title.length() > 80) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "标题过长");
         }
-        if (StringUtils.isAnyBlank(content, answer, judgeCase, judgeConfig)) {
+        if (StringUtils.isAnyBlank(content, sampleCase, judgeConfig)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "内容不能为空");
         }
     }
@@ -98,6 +97,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
         String title = questionQueryRequest.getTitle();
         String content = questionQueryRequest.getContent();
         List<String> tags = questionQueryRequest.getTags();
+        List<String> source = questionQueryRequest.getSource();
         String sortField = questionQueryRequest.getSortField();
         String sortOrder = questionQueryRequest.getSortOrder();
 
@@ -110,6 +110,11 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
         if (CollectionUtils.isNotEmpty(tags)) {
             for (String tag : tags) {
                 queryWrapper.like("tags", "\"" + tag + "\"");
+            }
+        }
+        if (CollectionUtils.isNotEmpty(source)) {
+            for (String sc : source) {
+                queryWrapper.like("source", "\"" + sc + "\"");
             }
         }
         queryWrapper.eq(ObjectUtils.isNotEmpty(userId), "userId", userId);
@@ -130,26 +135,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
         Set<Long> userIdSet = questionList.stream().map(Question::getUserId).collect(Collectors.toSet());
         Map<Long, List<User>> userIdUserListMap = userService.listByIds(userIdSet).stream()
                 .collect(Collectors.groupingBy(User::getId));
-        // 2. 已登录，获取用户点赞、收藏状态
-//        Map<Long, Boolean> questionIdHasThumbMap = new HashMap<>();
-//        Map<Long, Boolean> questionIdHasFavourMap = new HashMap<>();
-//        User loginUser = userService.getLoginUserPermitNull(request);
-//        if (loginUser != null) {
-//            Set<Long> questionIdSet = questionList.stream().map(Question::getId).collect(Collectors.toSet());
-//            loginUser = userService.getLoginUser(request);
-//            // 获取点赞
-//            QueryWrapper<QuestionThumb> questionThumbQueryWrapper = new QueryWrapper<>();
-//            questionThumbQueryWrapper.in("questionId", questionIdSet);
-//            questionThumbQueryWrapper.eq("userId", loginUser.getId());
-//            List<QuestionThumb> questionQuestionThumbList = questionThumbMapper.selectList(questionThumbQueryWrapper);
-//            questionQuestionThumbList.forEach(questionQuestionThumb -> questionIdHasThumbMap.put(questionQuestionThumb.getQuestionId(), true));
-//            // 获取收藏
-//            QueryWrapper<QuestionFavour> questionFavourQueryWrapper = new QueryWrapper<>();
-//            questionFavourQueryWrapper.in("questionId", questionIdSet);
-//            questionFavourQueryWrapper.eq("userId", loginUser.getId());
-//            List<QuestionFavour> questionFavourList = questionFavourMapper.selectList(questionFavourQueryWrapper);
-//            questionFavourList.forEach(questionFavour -> questionIdHasFavourMap.put(questionFavour.getQuestionId(), true));
-//        }
+
         // 填充信息
         List<QuestionVO> questionVOList = questionList.stream().map(question -> {
             QuestionVO questionVO = QuestionVO.objToVo(question);
@@ -160,8 +146,6 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
             }
             questionVO.setUserVO(userService.getUserVO(user));
             questionVO.setJudgeConfig(JSONUtil.toBean(question.getJudgeConfig(), JudgeConfig.class));
-//            questionVO.setHasThumb(questionIdHasThumbMap.getOrDefault(question.getId(), false));
-//            questionVO.setHasFavour(questionIdHasFavourMap.getOrDefault(question.getId(), false));
             return questionVO;
         }).collect(Collectors.toList());
         questionVOPage.setRecords(questionVOList);

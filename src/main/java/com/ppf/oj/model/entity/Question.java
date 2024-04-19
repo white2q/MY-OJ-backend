@@ -48,10 +48,10 @@ public class Question implements Serializable {
     private String tags;
 
     /**
-     * 题目答案
+     * 题目来源（json 数组）
      */
-    @TableField(value = "answer")
-    private String answer;
+    @TableField(value = "source")
+    private String source;
 
     /**
      * 题目提交数
@@ -66,7 +66,13 @@ public class Question implements Serializable {
     private Integer acceptedNum;
 
     /**
-     * 判题用例（json 数组）
+     * 判题样例（json 数组）
+     */
+    @TableField(value = "sampleCase")
+    private String sampleCase;
+
+    /**
+     * 判题样例（json 数组）
      */
     @TableField(value = "judgeCase")
     private String judgeCase;
@@ -76,18 +82,6 @@ public class Question implements Serializable {
      */
     @TableField(value = "judgeConfig")
     private String judgeConfig;
-
-    /**
-     * 点赞数
-     */
-    @TableField(value = "thumbNum")
-    private Integer thumbNum;
-
-    /**
-     * 收藏数
-     */
-    @TableField(value = "favourNum")
-    private Integer favourNum;
 
     /**
      * 创建时间

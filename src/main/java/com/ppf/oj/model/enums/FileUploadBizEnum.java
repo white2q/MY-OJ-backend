@@ -7,8 +7,6 @@ import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * 文件上传业务类型枚举
- *
- * @author <a href="https://github.com/white2q">ppf</a>
  */
 public enum FileUploadBizEnum {
 

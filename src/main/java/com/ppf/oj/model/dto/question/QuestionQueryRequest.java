@@ -40,6 +40,12 @@ public class QuestionQueryRequest extends PageRequest implements Serializable {
     @TableField(value = "tags")
     private List<String> tags;
 
+    /**
+     * 题目来源（json 数组）
+     */
+    @TableField(value = "source")
+    private List<String> source;
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }

@@ -48,6 +48,12 @@ public class QuestionVO implements Serializable {
     private List<String> tags;
 
     /**
+     * 题目来源（json 数组）
+     */
+    @TableField(value = "source")
+    private List<String> source;
+
+    /**
      * 题目提交数
      */
     @TableField(value = "submitNum")
@@ -64,19 +70,6 @@ public class QuestionVO implements Serializable {
      */
     @TableField(value = "judgeConfig")
     private JudgeConfig judgeConfig;
-
-    /**
-     * 点赞数
-     */
-    @TableField(value = "thumbNum")
-    private Integer thumbNum;
-
-    /**
-     * 收藏数
-     */
-    @TableField(value = "favourNum")
-    private Integer favourNum;
-
 
     /**
      * 创建人信息
@@ -140,6 +133,7 @@ public class QuestionVO implements Serializable {
         BeanUtils.copyProperties(question, questionVO);
         questionVO.setJudgeConfig(JSONUtil.toBean(question.getJudgeConfig(), JudgeConfig.class));
         questionVO.setTags(JSONUtil.toList(question.getTags(), String.class));
+        questionVO.setSource(JSONUtil.toList(question.getSource(), String.class));
         return questionVO;
     }
 }

@@ -38,6 +38,9 @@ build/
 # Compiled class file
 *.class
 
+#配置文件
+*.yml
+
 # Log file
 *.log
 

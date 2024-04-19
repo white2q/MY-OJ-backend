@@ -16,11 +16,6 @@ spring:
     port: 6379
     timeout: 5000
     password: 123456
-# knife4j的增强配置
-knife4j:
-  enable: true
-  # 开启生产环境屏蔽，一定要先开启knife4j增强才会生效
-  production: true
 cos:
   client:
     accessKeyId: LTAI5tBVZXjh4dbA1LFDW7me

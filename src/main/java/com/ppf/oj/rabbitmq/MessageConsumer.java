@@ -27,7 +27,6 @@ public class MessageConsumer {
 
     @Resource
     private WebSocket webSocket;
-
     // 指定程序监听的消息队列和确认机制
     @SneakyThrows
     @RabbitListener(queues = {"code_queue"}, ackMode = "MANUAL")
